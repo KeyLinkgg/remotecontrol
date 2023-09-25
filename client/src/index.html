@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello World!</title>
+    <link rel="stylesheet" href="index.css" />
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+
+  </head>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+      console.log("hello");
+    
+
+      var socket = io("http://localhost:3000")
+      var notyf = new Notyf();
+    
+    
+      socket.on("connect", () => {
+        isConnect = true;
+      });
+    
+      let roomID = Math.random().toString(36).substring(2, 15).toUpperCase();
+      let currentRoom = roomID;
+    
+      joinRoom(roomID);
+    
+        function joinRoom(ID){
+    
+          if(ID){
+          // console.log(ID);
+            socket.emit("joinRoom", ID);
+            currentRoom = ID;
+          }
+        }
+    
+        socket.on("joinedRoom", (ID) => {
+          console.log(ID);
+          currentRoom = ID;
+          notyf.success(`Joined Room [${ID}]`);
+        });
+    
+    
+        socket.on("keydown", (key) => {
+          console.log("keydown",key);
+        });
+    
+    
+        document.addEventListener('keydown', (event) => {
+        var name = event.key;
+        var code = event.code;
+        // console.log(`Key pressed ${name} \r\n Key code value: ${code}`);
+        socket.emit("keydown", name);
+        });
+    
+        socket.on("keyup", (key) => {
+          console.log("keyup",key);
+        });
+    
+    
+        document.addEventListener('keyup', (event) => {
+        var name = event.key;
+        var code = event.code;
+        // console.log(`Key pressed ${name} \r\n Key code value: ${code}`);
+        socket.emit("keyup", name);
+        });
+        
+    
+        </script>
+    
+    
+    
+        <h1 class="text-5xl md:text-7xl text-center font-black my-6 md:my-12">KeyLink</h1>
+    <h1>💖 Hello World!</h1>
+    <p>Welcome to your Electron application.</p>
+  </body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CombinedPlay</title>
+  <script src="/socket.io/socket.io.js"></script>
+<script src="//unpkg.com/alpinejs" defer></script>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+  var socket = io("http://24.199.126.84:3000")
+
+  // wait for connection
+ let isConnect = false;
+  socket.on("connect", () => {
+    console.log("connected");
+    isConnect = true;
+  });
+
+  function move(string){
+    console.log(string);
+    if(isConnect){
+      socket.emit("keyinput", string);
+    }
+  }
+
+  function easyInput(message){
+    // cut down message to the last character
+    message = message.slice(-1);
+    console.log(message);
+    if(isConnect){
+      socket.emit("keyinput", message);
+    }
+    message = "";
+  }
+
+
+  document.addEventListener('keydown', (event) => {
+  var name = event.key;
+  var code = event.code;
+  // Alert the key name and key code on keydown
+  // alert(`Key pressed ${name} \r\n Key code value: ${code}`);
+  console.log(`Key pressed ${name} \r\n Key code value: ${code}`);
+
+
+
+
+
+
+
+  let output = ""
+  if(code =='space'){
+    output = "code";
+  }else{
+    output=name;
+  }
+  output=code;
+  output.replace("Key", "")
+
+  if(isConnect){
+      socket.emit("keydown", name);
+    
+  }
+}, false);
+
+
+document.addEventListener('keydown', (event) => {
+  var name = event.key;
+  var code = event.code;
+  // Alert the key name and key code on keydown
+  // alert(`Key pressed ${name} \r\n Key code value: ${code}`);
+  console.log(`Key pressed ${name} \r\n Key code value: ${code}`);
+
+  if(isConnect){
+      socket.emit("keydown", name);
+    
+  }
+}, false);
+
+
+
+
+
+// document.addEventListener('mousedown', (event) => {
+
+//   if(isConnect){
+//       socket.emit("mouse", "mousedown");
+    
+//   }
+
+
+// }, false);
+
+
+// document.addEventListener('mouseup', (event) => {
+
+// if(isConnect){
+//     socket.emit("mouse", "mouseup");
+  
+// }
+
+
+// }, false);
+
+
+</script>
+</head>
+<body>
+
+
+
+<h1 class="text-5xl md:text-7xl text-center font-black my-6 md:my-12">CombinedPlay</h1>
+
+
+<div class="flex justify-center items-center mt-8 flex-col" x-data="">
+
+  <button type="button" class="rounded-md bg-blue-600 px-6 py-4 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" @click="move('W')">W</button>
+  <div class="mt-1">
+    <button type="button" class="rounded-md bg-blue-600 px-6 py-4 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" @click="move('A')">A</button>
+    <button type="button" class="rounded-md bg-blue-600 px-6 py-4 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" @click="move('S')">S</button>
+    <button type="button" class="rounded-md bg-blue-600 px-6 py-4 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" @click="move('D')">D</button>
+  </div>
+  <div>
+  <button type="button" class="mt-1 rounded-md bg-blue-600 px-[72px] py-4 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" @click="move('SPACE')">SPACE</button>
+</div>
+
+</div>
+
+<div class="flex justify-center items-center w-full">
+  <div class="mt-16 text-center">
+    <p class="font-semibold text-3xl">Alternative Input</p>
+    <div class="mt-2 w-full">
+      <div class="flex items-center justify-center w-full" x-data="{message: ''}">
+        <input spellcheck="false" type="text" x-model="message" class="w-full px-4 py-2 text-gray-900 placeholder-gray-400 bg-white border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-600 sm:text-sm text-white no-underline"
+        @input="easyInput(message)">
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

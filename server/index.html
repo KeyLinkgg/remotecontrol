@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KeyLink</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+
+    
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<script>
+
+  var socket = io("http://localhost:3000")
+  var notyf = new Notyf();
+
+
+  socket.on("connect", () => {
+    isConnect = true;
+  });
+
+  let roomID = Math.random().toString(36).substring(2, 15).toUpperCase();
+  let currentRoom = roomID;
+
+  joinRoom(roomID);
+
+    function joinRoom(ID){
+
+      if(ID){
+      // console.log(ID);
+        socket.emit("joinRoom", ID);
+        currentRoom = ID;
+      }
+    }
+
+    socket.on("joinedRoom", (ID) => {
+      console.log(ID);
+      currentRoom = ID;
+      notyf.success(`Joined Room [${ID}]`);
+    });
+
+
+    socket.on("keydown", (key) => {
+      console.log("keydown",key);
+    });
+
+
+    document.addEventListener('keydown', (event) => {
+    var name = event.key;
+    var code = event.code;
+    // console.log(`Key pressed ${name} \r\n Key code value: ${code}`);
+    socket.emit("keydown", name);
+    });
+
+    socket.on("keyup", (key) => {
+      console.log("keyup",key);
+    });
+
+
+    document.addEventListener('keyup', (event) => {
+    var name = event.key;
+    var code = event.code;
+    // console.log(`Key pressed ${name} \r\n Key code value: ${code}`);
+    socket.emit("keyup", name);
+    });
+    
+
+    </script>
+
+
+
+    <h1 class="text-5xl md:text-7xl text-center font-black my-6 md:my-12">KeyLink</h1>
+    
+
+    <div class="w-full justify-center flex">
+    <div class="w-1/3">
+      <div class="mt-2 flex rounded-md shadow-sm" x-data="{ code: ' '}">
+        <div class="relative flex flex-grow items-stretch focus-within:z-10">
+          <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <svg class="h-5 w-5 text-gray-400"  fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20.893 13.393l-1.135-1.135a2.252 2.252 0 01-.421-.585l-1.08-2.16a.414.414 0 00-.663-.107.827.827 0 01-.812.21l-1.273-.363a.89.89 0 00-.738 1.595l.587.39c.59.395.674 1.23.172 1.732l-.2.2c-.212.212-.33.498-.33.796v.41c0 .409-.11.809-.32 1.158l-1.315 2.191a2.11 2.11 0 01-1.81 1.025 1.055 1.055 0 01-1.055-1.055v-1.172c0-.92-.56-1.747-1.414-2.089l-.655-.261a2.25 2.25 0 01-1.383-2.46l.007-.042a2.25 2.25 0 01.29-.787l.09-.15a2.25 2.25 0 012.37-1.048l1.178.236a1.125 1.125 0 001.302-.795l.208-.73a1.125 1.125 0 00-.578-1.315l-.665-.332-.091.091a2.25 2.25 0 01-1.591.659h-.18c-.249 0-.487.1-.662.274a.931.931 0 01-1.458-1.137l1.411-2.353a2.25 2.25 0 00.286-.76m11.928 9.869A9 9 0 008.965 3.525m11.928 9.868A9 9 0 118.965 3.525" />
+            </svg>
+            
+          </div>
+          <input type="email" name="email" id="email" class="block w-full rounded-none rounded-l-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Room Code" x-model="code">
+        </div>
+        <button type="button" class="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:bg-gray-200" @click="()=>{
+          joinRoom(code.toUpperCase());code='';
+        }" :disabled="code.toUpperCase()==currentRoom || code == '' ">
+
+          <svg class="-ml-0.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+          </svg>
+          Join
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="w-full flex justify-center">
+  <div class="w-1/3 bg-slate-200">
+  <p x-data="">Current Room Code: <span x-text="currentRoom"></span>
+  </p>
+
+</div>
+</div>
+
+    <div class="flex justify-center items-center mt-8 flex-col" x-data="">
+    
+      <button type="button" class="rounded-md bg-blue-600 px-6 py-4 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" @click="move('W')">W</button>
+      <div class="mt-1">
+        <button type="button" class="rounded-md bg-blue-600 px-6 py-4 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" @click="move('A')">A</button>
+        <button type="button" class="rounded-md bg-blue-600 px-6 py-4 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" @click="move('S')">S</button>
+        <button type="button" class="rounded-md bg-blue-600 px-6 py-4 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" @click="move('D')">D</button>
+      </div>
+      <div>
+      <button type="button" class="mt-1 rounded-md bg-blue-600 px-[72px] py-4 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" @click="move('SPACE')">SPACE</button>
+    </div>
+    
+    </div>
+    
+    <!-- <div class="flex justify-center items-center w-full">
+      <div class="mt-16 text-center">
+        <p class="font-semibold text-3xl">Alternative Input</p>
+        <div class="mt-2 w-full">
+          <div class="flex items-center justify-center w-full" x-data="{message: ''}">
+            <input spellcheck="false" type="text" x-model="message" class="w-full px-4 py-2 text-gray-900 placeholder-gray-400 bg-white border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-600 sm:text-sm text-white no-underline"
+            @input="socket.emit("key",message)" @click="()=>{socket.emit("key",message);
+          console.log("sending");}">
+          </div>
+        </div>
+      </div>
+    </div>
+     -->
+
+     <div>
+      <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email</label>
+      <div class="mt-2">
+        <input type="email" name="email" id="email" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="you@example.com">
+      </div>
+    </div>
+    </body>
+</html>
